@@ -18,104 +18,40 @@ Also in your index.html, add the following \<script\> block:
 *Note*: replace \<YOUR_APP_KEY\> with your Localytics app key
 
 	<script type="text/javascript">
-        function onLoad() {
-            document.addEventListener("deviceready", onDeviceReady, false);
-            document.addEventListener("resume", onResume, false);
-            document.addEventListener("pause", onPause, false);
-        }
-        function onDeviceReady() {
-            Localytics.init("<YOUR_APP_KEY>");
-            Localytics.resume();
-            Localytics.upload();
-        }
-        function onResume() {
-            Localytics.resume();
-            Localytics.upload();
-        }
-        function onPause() {
-            Localytics.close();
-            Localytics.upload();
-        }
-    </script>
+    function onLoad() {
+      document.addEventListener("deviceready", onDeviceReady, false);
+      document.addEventListener("resume", onResume, false);
+      document.addEventListener("pause", onPause, false);
+    }
+    function onDeviceReady() {
+      Localytics.init("<YOUR_APP_KEY>");
+      Localytics.resume();
+      Localytics.upload();
+    }
+    function onResume() {
+      Localytics.resume();
+      Localytics.upload();
+    }
+    function onPause() {
+      Localytics.close();
+      Localytics.upload();
+    }
+  </script>
 
 #### Android
 
-In your AndroidManifest.xml, add the following before your \<application\> tag:
-
-*Note*: replace YOUR.PACKAGE.NAME with your package name, ie, com.yourcompany.yourapp
-
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
-	<permission android:name="YOUR.PACKAGE.NAME.permission.C2D_MESSAGE"
-	    android:protectionLevel="signature" />
-	<uses-permission android:name="YOUR.PACKAGE.NAME.permission.C2D_MESSAGE" />
-
-Inside your \<application\> tag, add:
-
-*Note*: replace \<YOUR_APP_KEY\> with your Localytics app key and YOUR.PACKAGE.NAME with your package name
-
-	<receiver
-	    android:name="com.localytics.android.PushReceiver"
-	    android:permission="com.google.android.c2dm.permission.SEND" >
-	    <intent-filter>
-	        <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-	        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-	        <category android:name="YOUR.PACKAGE.NAME" />
-	    </intent-filter>
-	</receiver>
-
 	<meta-data android:name="LOCALYTICS_APP_KEY" android:value="<YOUR_APP_KEY>" />
 
-At the top of your main activity, add the following import:
+At the top of your Application, add the following import:
 
 	import com.localytics.android.*;
 
-Add the session object as a private member variable inside your activity class:
+Inside your Application class, add or modify the following methods:
 
-	private LocalyticsAmpSession localyticsSession;
-
-Inside your activity class, add or modify the following methods:
-
-*Note*: replace \<YOUR_PROJECT_NUMBER\> with your GCM project number
-
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		// ... existing code ...
-
-		this.localyticsSession = new LocalyticsSession(this.getApplicationContext());
-		this.localyticsSession.registerPush("<YOUR_PROJECT_NUMBER>");
-		this.localyticsSession.open();
-		this.localyticsSession.handlePushReceived(getIntent());
-		this.localyticsSession.upload();
-	}
-
-	@Override
-	public void onResume()
-	{
-	    super.onResume();
-	    this.localyticsSession.open();
-	    this.localyticsSession.handlePushReceived(getIntent());
-	    this.localyticsSession.upload();
-	}
-
-	@Override
-	public void onPause()
-	{
-	    this.localyticsSession.close();
-	    this.localyticsSession.upload();
-	    super.onPause();
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent)
-	{
-	    super.onNewIntent(intent);
-	    setIntent(intent);
-	}
+  public void onCreate(){
+      super.onCreate();
+      registerActivityLifecycleCallbacks(new LocalyticsActivityLifecycleCallbacks(this));
+  }
 
 ## Instrumentation
 

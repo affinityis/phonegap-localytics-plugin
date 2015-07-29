@@ -18,53 +18,31 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.localytics.android.LocalyticsAmpSession;
+import com.localytics.android.*;
 
 /**
  * This class echoes a string called from JavaScript.
  */
 public class LocalyticsPlugin extends CordovaPlugin {
 
-    private LocalyticsAmpSession localyticsSession;
-
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        try {
-            this.localyticsSession = new LocalyticsAmpSession(cordova.getActivity().getApplicationContext());
-        }
-        catch (final Exception e) {}
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("init")) {
-            String key = args.getString(0);
-            if (key != null && key.length() > 0) {
-                this.localyticsSession = new LocalyticsAmpSession(cordova.getActivity().getApplicationContext(), key);
-                callbackContext.success();
-            } else {
-                callbackContext.error("Expected non-empty key argument.");
-            }
-            return true;
-        }
-        else if (action.equals("resume")) {
-            this.localyticsSession.open();
-            callbackContext.success();
-            return true;
-        }
-        else if (action.equals("close")) {
-            this.localyticsSession.close();
             callbackContext.success();
             return true;
         }
         else if (action.equals("upload")) {
-            this.localyticsSession.upload();
+            Localytics.upload();
             callbackContext.success();
             return true;
         }
         else if (action.equals("upload")) {
-            this.localyticsSession.upload();
+            Localytics.upload();
             callbackContext.success();
             return true;
         }
@@ -87,7 +65,7 @@ public class LocalyticsPlugin extends CordovaPlugin {
                         }
                     }
                     int customerValueIncrease = args.getInt(2);
-                    this.localyticsSession.tagEvent(name, a, null, customerValueIncrease);
+                    Localytics.tagEvent(name, a, customerValueIncrease);
                     callbackContext.success();
                 } else {
                     callbackContext.error("Expected non-empty name argument.");
@@ -96,29 +74,32 @@ public class LocalyticsPlugin extends CordovaPlugin {
                 callbackContext.error("Expected three arguments.");
             }
             return true;
-        } else if (action.equals("tagScreen")) {
+        }
+        else if (action.equals("tagScreen")) {
             String name = args.getString(0);
             if (name != null && name.length() > 0) {
-                this.localyticsSession.tagScreen(name);
+                Localytics.tagScreen(name);
                 callbackContext.success();
             } else {
                 callbackContext.error("Expected non-empty name argument.");
             }
             return true;
-        } else if (action.equals("setCustomDimension")) {
+        }
+        else if (action.equals("setCustomDimension")) {
             if (args.length() == 2) {
                 int index = args.getInt(0);
                 String value = null;
                 if (!args.isNull(1)) {
                     value = args.getString(1);
                 }
-                this.localyticsSession.setCustomDimension(index, value);
+                Localytics.setCustomDimension(index, value);
                 callbackContext.success();
             } else {
                 callbackContext.error("Expected two arguments.");
             }
             return true;
-        } else if (action.equals("setCustomIdentifier")) {
+        }
+        else if (action.equals("setProfileValue")) {
             if (args.length() == 2) {
                 String name = args.getString(0);
                 if (name != null && name.length() > 0) {
@@ -126,7 +107,7 @@ public class LocalyticsPlugin extends CordovaPlugin {
                     if (!args.isNull(1)) {
                         value = args.getString(1);
                     }
-                    this.localyticsSession.setCustomerData(name, value);
+                    Localytics.setIdentifier(name, value);
                     callbackContext.success();
                 } else {
                     callbackContext.error("Expected non-empty name argument.");
@@ -135,46 +116,41 @@ public class LocalyticsPlugin extends CordovaPlugin {
                 callbackContext.error("Expected two arguments.");
             }
             return true;
-        } else if (action.equals("setCustomerId")) {
+        }
+        else if (action.equals("setCustomerId")) {
             String id = null;
             if (!args.isNull(0)) {
                 id = args.getString(0);
             }
-            this.localyticsSession.setCustomerId(id);
+            Localytics.setCustomerId(id);
             callbackContext.success();
             return true;
-        } else if (action.equals("setCustomerName")) {
+        }
+        else if (action.equals("setCustomerName")) {
             String name = null;
             if (!args.isNull(0)) {
                 name = args.getString(0);
             }
-            this.localyticsSession.setCustomerName(name);
+            Localytics.setCustomerFullName(name);
             callbackContext.success();
             return true;
-        } else if (action.equals("setCustomerEmail")) {
+        }
+        else if (action.equals("setCustomerEmail")) {
             String email = null;
             if (!args.isNull(0)) {
                 email = args.getString(0);
             }
-            this.localyticsSession.setCustomerEmail(email);
+            Localytics.setCustomerEmail(email);
             callbackContext.success();
             return true;
-        } else if (action.equals("setLoggingEnabled")) {
+        }
+        else if (action.equals("setLoggingEnabled")) {
             boolean enabled = args.getBoolean(0);
-            LocalyticsAmpSession.setLoggingEnabled(enabled);
+            Localytics.setLoggingEnabled(enabled);
             callbackContext.success();
             return true;
-        } else if (action.equals("setHttpsEnabled")) {
-            boolean enabled = args.getBoolean(0);
-            LocalyticsAmpSession.setHttpsEnabled(enabled);
-            callbackContext.success();
-            return true;
-        } else if (action.equals("setSessionTimeout")) {
-            int timeout = args.getInt(0);
-            LocalyticsAmpSession.setSessionExpiration(timeout);
-            callbackContext.success();
-            return true;
-        } else if (action.equals("setAdvertisingIdentifierEnabled")) {
+        }
+        else if (action.equals("setAdvertisingIdentifierEnabled")) {
             return true;
         }
 
