@@ -67,7 +67,7 @@
             <permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/application">
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <receiver android:name="com.localytics.android.PushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
                 <intent-filter>
                     <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
