@@ -5,7 +5,9 @@ Localytics for PhoneGap/Cordova 3.x
 
 	cordova plugin add https://github.com/mallzee/phonegap-localytics-plugin.git --variable APP_ID=[APP ID]
 
-## Integration (iOS Only)
+## Integration
+
+### iOS
 
 The plugin now fully integrates without the need to modify your AppDelegate.m file. The following JavaScript code is bare minimum to get running. This will integrate the analytics and marketing segments of the SDK.
 
@@ -38,20 +40,38 @@ Also in your index.html, add the following \<script\> block:
     }
   </script>
 
-#### Android
+### Android
+
+Make sure the following is added to the application block of AndroidManifest.xml
 
 	<meta-data android:name="LOCALYTICS_APP_KEY" android:value="<YOUR_APP_KEY>" />
 
-At the top of your Application, add the following import:
+Localytics needs to be initialized once in the `onCreate` method of your application class.
 
-	import com.localytics.android.*;
+If you don’t have an application class (which is most likely the case for a Cordova app), you can create one using this template:
 
-Inside your Application class, add or modify the following methods:
+```java
+package my.package.namespace;
 
-  public void onCreate(){
-      super.onCreate();
-      registerActivityLifecycleCallbacks(new LocalyticsActivityLifecycleCallbacks(this));
-  }
+import android.app.Application;
+import com.localytics.android.*;
+
+public class App extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        registerActivityLifecycleCallbacks(new LocalyticsActivityLifecycleCallbacks(this));
+    }
+
+}
+```
+
+And add your application name to `AndroidManifest.xml`:
+
+```xml
+<application android:name="my.package.namespace.App" ... >...</application>
+```
 
 ## Instrumentation
 
@@ -96,5 +116,4 @@ Localytics now supports profiles. You can start to tag attributes about your cus
 Localytics requires the devices push token to enable the push marketing campaigns. With the default integration it forces the user to answer the question of if they want Push Notifications enabled for the app in question. Sometimes, this is not the correct place to ask. This allows you to set the push token on you're own schedule. A good time to ask is after an action that you could update the user on so they understand the value of the notifications from your app.
 
     Localytics.setPushToken(token);
-
 
